@@ -172,6 +172,45 @@ export class OBDService {
     this._lastHeader = header;
   }
 
+  async sendWakeup(): Promise<void> {
+    if (this._statusSubject.value !== 'connected') {
+      throw new Error('Not connected');
+    }
+    // Gen2 AZE0 (2013+) wakeup sequence matching OVMS behavior:
+    // Send 0x679 (VCM wakeup) and 0x5C0 (battery heater spoof) 24 times
+    await this._assertOK(await this._sendAT('AT SH 679'));
+    for (let i = 0; i < 24; i++) {
+      await this._sendAT('00', 100);
+    }
+    await this._assertOK(await this._sendAT('AT SH 5C0'));
+    for (let i = 0; i < 24; i++) {
+      await this._sendAT('00 00 00 00 00 00 00 00', 100);
+    }
+    this._lastHeader = '';
+  }
+
+  async sendClimateControl(enable: boolean, wakeup = true): Promise<void> {
+    if (this._statusSubject.value !== 'connected') {
+      throw new Error('Not connected');
+    }
+    // Pre-2016 AZE0: 1-byte command on CAN1 via 0x56E
+    // Enable: 0x4E, Disable: 0x56, Auto-disable: 0x46
+    if (wakeup) {
+      await this.sendWakeup();
+    }
+    await this._assertOK(await this._sendAT('AT SH 56E'));
+    const cmdByte = enable ? '4E' : '56';
+    for (let i = 0; i < 24; i++) {
+      await this._sendAT(cmdByte, 100);
+    }
+    if (enable) {
+      // Auto-disable after 1 second, matching OVMS m_ccDisableTimer
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      await this._sendAT('46', 100);
+    }
+    this._lastHeader = '';
+  }
+
   async sendCommand(cmd: import('./types').OBDCommand): Promise<import('./types').OBDResponse> {
     if (this._statusSubject.value !== 'connected') {
       throw new Error('Not connected');

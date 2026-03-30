@@ -2,10 +2,11 @@ import { useState } from 'react';
 import { ConnectionPanel } from './components/ConnectionPanel';
 import { PollingPanel } from './components/PollingPanel';
 import { ListenPanel } from './components/ListenPanel';
+import { ControlPanel } from './components/ControlPanel';
 import { obdService } from './obd.service';
 import { useObservable } from './hooks/useObservable';
 
-type Mode = 'polling' | 'listening';
+type Mode = 'polling' | 'listening' | 'control';
 
 function App() {
   const [mode, setMode] = useState<Mode>('polling');
@@ -56,7 +57,7 @@ function App() {
         {/* Mode Tabs */}
         <div className="bg-white rounded-lg shadow overflow-hidden">
           <div className="flex border-b">
-            {(['polling', 'listening'] as Mode[]).map(m => (
+            {(['polling', 'listening', 'control'] as Mode[]).map(m => (
               <button
                 key={m}
                 onClick={() => handleModeChange(m)}
@@ -66,7 +67,7 @@ function App() {
                     : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
                 }`}
               >
-                {m === 'polling' ? 'Polling' : 'Static Listening'}
+                {m === 'polling' ? 'Polling' : m === 'listening' ? 'Static Listening' : 'Control'}
               </button>
             ))}
           </div>
@@ -74,8 +75,10 @@ function App() {
           <div className="p-4">
             {mode === 'polling' ? (
               <PollingPanel isConnected={isConnected} />
-            ) : (
+            ) : mode === 'listening' ? (
               <ListenPanel isConnected={isConnected} />
+            ) : (
+              <ControlPanel isConnected={isConnected} />
             )}
           </div>
         </div>

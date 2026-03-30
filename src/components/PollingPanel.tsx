@@ -13,6 +13,7 @@ export function PollingPanel({ isConnected }: Props) {
   const [loading, setLoading] = useState(false);
   const [pollingEnabled, setPollingEnabled] = useState(false);
   const [pollInterval, setPollInterval] = useState(2);
+  const [wakeupEnabled, setWakeupEnabled] = useState(false);
   const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const selectedCommand = AZE0_24KWH_COMMANDS[selectedIndex];
@@ -21,6 +22,9 @@ export function PollingPanel({ isConnected }: Props) {
     if (!isConnected || loading) return;
     setLoading(true);
     try {
+      if (wakeupEnabled) {
+        await obdService.sendWakeup();
+      }
       const res = await obdService.sendCommand(selectedCommand);
       setResponse(res);
     } finally {
@@ -88,6 +92,15 @@ export function PollingPanel({ isConnected }: Props) {
           className="w-16 border rounded px-2 py-1 text-sm disabled:opacity-50"
         />
         <span className="text-sm">seconds</span>
+
+        <label className="flex items-center gap-2 text-sm">
+          <input
+            type="checkbox"
+            checked={wakeupEnabled}
+            onChange={e => setWakeupEnabled(e.target.checked)}
+          />
+          Wakeup before send
+        </label>
       </div>
 
       {!isConnected && (
