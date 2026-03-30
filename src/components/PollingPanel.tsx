@@ -51,8 +51,7 @@ export function PollingPanel({ isConnected }: Props) {
             setSelectedIndex(Number(e.target.value));
             setResponse(null);
           }}
-          disabled={!isConnected}
-          className="border rounded px-2 py-1 text-sm bg-white disabled:opacity-50 disabled:cursor-not-allowed"
+          className="border rounded px-2 py-1 text-sm bg-white"
         >
           {AZE0_24KWH_COMMANDS.map((cmd, i) => (
             <option key={cmd.name} value={i}>

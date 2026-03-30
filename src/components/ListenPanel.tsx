@@ -91,12 +91,12 @@ export function ListenPanel({ isConnected }: Props) {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center gap-2 flex-wrap">
+      <div className="flex flex-col gap-2">
         <select
           value={selectedPreset}
           onChange={e => setSelectedPreset(e.target.value)}
-          disabled={listening || !isConnected}
-          className="border rounded px-2 py-1 text-sm font-mono disabled:opacity-50 min-w-0 flex-1"
+          disabled={listening}
+          className="border rounded px-2 py-1 text-sm font-mono disabled:opacity-50 w-full"
         >
           <option value={ALL_VALUE}>All Messages (no filter)</option>
           <option value={CUSTOM_VALUE}>Custom CAN ID...</option>
@@ -111,13 +111,14 @@ export function ListenPanel({ isConnected }: Props) {
             ))}
           </optgroup>
         </select>
+        <div className="flex items-center gap-2">
         {selectedPreset === CUSTOM_VALUE && (
           <input
             type="text"
             value={customCanId}
             onChange={e => setCustomCanId(e.target.value)}
             placeholder="e.g. 5C5"
-            disabled={listening || !isConnected}
+            disabled={listening}
             className="border rounded px-2 py-1 text-sm font-mono w-24 disabled:opacity-50"
           />
         )}
@@ -143,6 +144,7 @@ export function ListenPanel({ isConnected }: Props) {
         >
           Clear
         </button>
+        </div>
       </div>
 
       {!isConnected && (
