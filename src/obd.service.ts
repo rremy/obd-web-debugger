@@ -157,7 +157,7 @@ export class OBDService {
     if (this._statusSubject.value !== 'connected') {
       throw new Error('Not connected');
     }
-    await this._assertOK(await this._sendAT(`AT CRA ${canId}`));
+    await this._assertOK(await this._sendAT(canId ? `AT CRA ${canId}` : 'AT CRA'));
     this._listening = true;
     this._rxBuffer = '';
     this._writeChar!.writeValue(this._encoder.encode('AT MA\r'));

@@ -1,50 +1,46 @@
-# React + TypeScript + Vite
+# Leaf OBD Web Debugger
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A browser-based OBD-II debugger for the Nissan Leaf, connecting to an ELM327-compatible Bluetooth adapter via Web Bluetooth.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **BLE Connection** -- Pairs with ELM327 adapters over Web Bluetooth (Chrome / Edge)
+- **Polling Mode** -- Send OBD-II commands and decode responses (battery, motor, climate, etc.)
+- **Static Listening Mode** -- Passively monitor raw CAN frames, with preset filters for known Leaf CAN IDs on both EV Bus (CAN1) and CAR Bus (CAN2)
+- **ISO-TP Parser** -- Reassembles multi-frame ISO 15765-2 responses
 
-## Expanding the ESLint configuration
+## Tech Stack
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+- React 18 + TypeScript
+- Vite
+- Tailwind CSS
+- RxJS (reactive BLE data streams)
+- Web Bluetooth API
 
-- Configure the top-level `parserOptions` property like this:
+## Getting Started
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+```bash
+# Install dependencies
+npm install
+
+# Start dev server
+npm run dev
+
+# Build for production
+npm run build
 ```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+Open the app in Chrome or Edge (Web Bluetooth is not supported in Firefox/Safari), then click **Connect** to pair with your ELM327 adapter.
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+## CAN Bus Reference
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
-```
+| Bus | Speed | Examples |
+|-----|-------|---------|
+| CAN1 -- EV Bus | 500 kbps | Battery SOC/SOH, motor temps, charge status, GIDs |
+| CAN2 -- CAR Bus | 500 kbps | Throttle, brakes, odometer, TPMS, door states |
+
+## Requirements
+
+- A Chromium-based browser with Web Bluetooth support
+- An ELM327-compatible BLE OBD-II adapter
+- A Nissan Leaf (ZE0 / AZE0 / ZE1)
